@@ -1,0 +1,39 @@
+flowchart LR
+  subgraph Browser["User Browser (sessionStorage)"]
+    B1[/Login Page/]
+    B2[/Home/]
+    B3[/Fetch/]
+  end
+
+  subgraph BlazorUi["BlazorUi (Blazor Server)"]
+    U1[Login.razor]
+    U2[Index.razor]
+    U3[FetchData.razor]
+  end
+
+  subgraph ApiHost["ApiHost (ASP.NET Core API)"]
+    A1[AuthController /auth/token]
+    A2[ProductsController /api/internal/products]
+    A3[Approve (policy: CanApprove)]
+    A4[SapProxyController /api/proxy/sap/items]
+    K[(Random 64-char signing key in memory)]
+  end
+
+  Browser <--> BlazorUi
+  BlazorUi <--> ApiHost
+
+  B1 --> U1
+  U1 -->|POST /auth/token| A1
+  A1 -->|access_token| U1
+  U1 -->|save to sessionStorage| B1
+
+  B2 --> U2 -->|POST approve (Bearer)| A3
+  B3 --> U3 -->|GET sap/items (Bearer)| A4
+
+  A2 -->|Authorize| A2
+  A3 -->|Policy: CanApprove| A3
+  A4 -->|Policy: ApiScope| A4
+  K --- A1
+  K --- A2
+  K --- A3
+  K --- A4
