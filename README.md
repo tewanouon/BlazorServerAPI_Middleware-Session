@@ -1,3 +1,5 @@
+.Net Core 8 & Blazor server
+
 # BlazorServerAPI_Middleware-Session
 BlazorServerAPI_Middleware with Session 
 
